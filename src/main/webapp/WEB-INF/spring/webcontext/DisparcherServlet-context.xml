@@ -33,7 +33,6 @@
 	</bean>
 
 	<context:component-scan base-package="com.packt.webstore" />
-
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/views/" />
@@ -88,18 +87,18 @@
 	</bean>
 	<bean id="unitsInStockValidator" class="com.packt.webstore.validator.UnitsStockValidator" />
 
-		<bean id="tilesViewResolver"
-        class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
-    </bean>
-	
-	<bean id="tilesConfigurer"
-        class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
-        <property name="definitions">
+	<bean id="tilesViewResolver"
+		class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+	</bean>
 
-            <list>
-                <value>/WEB-INF/tiles/definitions/tile-definition.xml</value>
-            </list>
-        </property>
+	<bean id="tilesConfigurer"
+		class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+
+			<list>
+				<value>/WEB-INF/tiles/definitions/tile-definition.xml</value>
+			</list>
+		</property>
 	</bean>
 
 
