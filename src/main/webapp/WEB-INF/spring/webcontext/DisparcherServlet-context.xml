@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:webflow-config="http://www.springframework.org/schema/webflow-config"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/webflow-config
+	http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.3.xsd">
+
+	<!-- konfiguracja dla web flow skad ma czytac przeplywy a przeplywow moze 
+		byc wiele -->
+	<webflow-config:flow-executor id="flowExecutor"
+		flow-registry="flowRegistry"></webflow-config:flow-executor>
+	<webflow-config:flow-registry id="flowRegistry"
+		base-path="/WEB-INF/flows">
+		<webflow-config:flow-location path="/checkout/checkout-flow.xml"
+			id="checkout" />
+	</webflow-config:flow-registry>
+
+	<mvc:annotation-driven enable-matrix-variables="true"
+		validator="validator" />
+
+	<bean id="flowHandlerMapping"
+		class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+		<property name="flowRegistry" ref="flowRegistry" />
+	</bean>
+
+	<bean id="flowHandlerAdapter"
+		class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+		<property name="flowExecutor" ref="flowExecutor" />
+	</bean>
+
+	<context:component-scan base-package="com.packt.webstore" />
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+	</bean>
+
+	<mvc:resources location="/resources/" mapping="/resource/**" />
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10240000" />
+	</bean>
+
+	<mvc:interceptors>
+		<bean class="com.packt.webstore.interceptor.PerformanceMonitorInterceptor"></bean>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="language" />
+		</bean>
+		<bean class="com.packt.webstore.interceptor.AuditingInterceptor"></bean>
+		<bean class="com.packt.webstore.interceptor.PromoCodeInterceptor">
+			<property name="promoCode" value="OF3RTA">
+			</property>
+			<property name="errorRedirect" value="invalidPromoCode">
+			</property>
+			<property name="offerRedirect" value="products">
+			</property>
+		</bean>
+
+	</mvc:interceptors>
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="pl" />
+	</bean>
+
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="validationMessageSource" ref="messageSource"></property>
+	</bean>
+
+	<bean id="productValidator" class="com.packt.webstore.validator.ProductValidator">
+		<property name="springValidators">
+			<set>
+				<ref bean="unitsInStockValidator"></ref>
+			</set>
+
+		</property>
+	</bean>
+	<bean id="unitsInStockValidator" class="com.packt.webstore.validator.UnitsStockValidator" />
+
+		<bean id="tilesViewResolver"
+        class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+    </bean>
+	
+	<bean id="tilesConfigurer"
+        class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+        <property name="definitions">
+
+            <list>
+                <value>/WEB-INF/tiles/definitions/tile-definition.xml</value>
+            </list>
+        </property>
+	</bean>
+
+
+</beans>
